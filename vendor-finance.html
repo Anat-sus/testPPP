@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>การเงินร้าน | เสียงสารคาม</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script>tailwind.config = { theme: { extend: { fontFamily: { kanit: ['Kanit', 'sans-serif'] }, colors: { brand: { orange: '#e05a47', teal: '#168b82', cream: '#fffaf3', ink: '#172033' } } } } };</script>
+  <style>
+    body { font-family: 'Kanit', sans-serif; background: #172033; }
+    .app { min-height: 844px; max-width: 430px; background: #f8fafc; box-shadow: 0 24px 70px #0008; }
+    .toast { transform: translateY(120px); transition: transform .25s ease; }
+    .toast.show { transform: translateY(0); }
+  </style>
+</head>
+<body class="sm:p-6 flex justify-center">
+  <div class="app w-full sm:rounded-[32px] overflow-hidden relative">
+    <main class="p-5 pb-24">
+      <a href="vendor.html" class="inline-block mb-4 rounded-full bg-white px-4 py-2 text-sm shadow-sm"><i class="fa-solid fa-arrow-left mr-2"></i>ย้อนกลับ</a>
+      <h1 class="text-2xl font-bold text-brand-ink mb-4">📊 สรุปการเงิน</h1>
+      <div class="grid grid-cols-3 gap-2 mb-4"><div class="rounded-2xl bg-white p-3 text-center border"><small class="text-xs text-slate-400">รายรับ</small><b class="block">24,500</b></div><div class="rounded-2xl bg-white p-3 text-center border"><small class="text-xs text-slate-400">ต้นทุน</small><b class="block text-rose-500">14,000</b></div><div class="rounded-2xl bg-emerald-50 p-3 text-center border border-emerald-200"><small class="text-xs text-emerald-700">กำไร</small><b class="block text-emerald-600">10,500</b></div></div>
+      <div class="rounded-3xl bg-white p-5 border"><h2 class="font-bold">ยอดขาย 4 สัปดาห์ล่าสุด</h2><div class="mt-5 h-40 flex items-end justify-around border-b"><div class="w-10 h-16 rounded-t-xl bg-orange-200"></div><div class="w-10 h-24 rounded-t-xl bg-orange-300"></div><div class="w-10 h-32 rounded-t-xl bg-brand-orange"></div><div class="w-10 h-36 rounded-t-xl bg-brand-teal"></div></div><div class="flex justify-around text-xs text-slate-400 mt-2"><span>สัปดาห์ 1</span><span>สัปดาห์ 2</span><span>สัปดาห์ 3</span><span>สัปดาห์นี้</span></div></div>
+      <button id="export-btn" class="mt-4 w-full rounded-2xl bg-brand-ink py-3 text-white"><i class="fa-solid fa-download mr-2"></i>ดาวน์โหลดสรุป</button>
+    </main>
+    <div id="toast" class="toast fixed bottom-5 left-1/2 z-50 -translate-x-1/2 rounded-full bg-brand-ink px-5 py-3 text-sm text-white shadow-xl"></div>
+  </div>
+  <script>
+    const toastEl = document.querySelector('#toast');
+    function toast(message) { toastEl.textContent = message; toastEl.classList.add('show'); clearTimeout(toast.timer); toast.timer = setTimeout(() => toastEl.classList.remove('show'), 2600); }
+    document.querySelector('#export-btn').addEventListener('click', () => { const report = 'สรุปการเงินร้านแม่บัว\nรายรับ: 24,500 บาท\nต้นทุน: 14,000 บาท\nกำไรสุทธิ: 10,500 บาท'; const link = document.createElement('a'); link.href = URL.createObjectURL(new Blob([report], { type: 'text/plain;charset=utf-8' })); link.download = 'สรุปการเงินร้านแม่บัว.txt'; link.click(); URL.revokeObjectURL(link.href); toast('ดาวน์โหลดสรุปแล้ว'); });
+  </script>
+</body>
+</html>

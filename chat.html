@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AskMe Chat</title>
+  <style>
+    :root { color-scheme: dark; font-family: system-ui, sans-serif; }
+    body { margin: 0; background: #10131a; color: #eef2ff; }
+    main { width: min(900px, calc(100% - 32px)); margin: 32px auto; }
+    h1 { margin-bottom: 8px; }
+    .panel, .message { background: #191e29; border: 1px solid #30394b; border-radius: 14px; padding: 16px; }
+    .panel { display: grid; gap: 12px; }
+    label { color: #aeb9d0; font-size: .9rem; }
+    select, textarea, button { font: inherit; border-radius: 9px; border: 1px solid #3c4962; padding: 10px; }
+    select, textarea { background: #0f141e; color: #fff; }
+    textarea { min-height: 90px; resize: vertical; }
+    button { background: #6d63ff; color: white; border: 0; cursor: pointer; }
+    button:disabled { opacity: .5; cursor: wait; }
+    #messages { display: grid; gap: 12px; margin: 18px 0; }
+    .role { color: #9eaaff; font-weight: 700; margin-bottom: 6px; }
+    .content { white-space: pre-wrap; overflow-wrap: anywhere; }
+    #status { color: #aeb9d0; min-height: 1.4em; }
+    .error { color: #ff9b9b; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>AskMe Chat</h1>
+    <p id="status">กำลังเข้าสู่ระบบ...</p>
+    <section class="panel">
+      <label for="model">โมเดล</label>
+      <select id="model" disabled></select>
+      <label for="prompt">ข้อความ</label>
+      <textarea id="prompt" placeholder="พิมพ์ข้อความของคุณ..."></textarea>
+      <button id="send" disabled>ส่งข้อความ</button>
+    </section>
+    <section id="messages" aria-live="polite"></section>
+  </main>
+  <script>
+    const BASE_URL = "https://itmsuhackathon.askme.co.th";
+    const email = sessionStorage.getItem("askme_email") || prompt("AskMe email");
+    const password = sessionStorage.getItem("askme_password") || prompt("AskMe password");
+    const state = { token: "", sessionId: "", messages: [] };
+    const statusEl = document.querySelector("#status");
+    const modelEl = document.querySelector("#model");
+    const promptEl = document.querySelector("#prompt");
+    const sendEl = document.querySelector("#send");
+    const messagesEl = document.querySelector("#messages");
+
+    function errorMessage(data, fallback) {
+      if (data?.error && typeof data.error === "object") return data.error.message || data.error.code || fallback;
+      return data?.message || (typeof data?.error === "string" ? data.error : fallback);
+    }
+
+    async function login() {
+      const response = await fetch(`${BASE_URL}/api/v1/auth/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password })
+      });
+      const data = await response.json();
+      if (!response.ok || !data.access_token) throw new Error(errorMessage(data, "เข้าสู่ระบบไม่สำเร็จ"));
+      state.token = data.access_token;
+    }
+
+    async function loadModels() {
+      const response = await fetch(`${BASE_URL}/api/v1/chat-api/models`, {
+        headers: { Authorization: `Bearer ${state.token}` }
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(errorMessage(data, "โหลดรายการโมเดลไม่สำเร็จ"));
+      const models = Array.isArray(data) ? data : (data.models || data.data || []);
+      modelEl.replaceChildren(...models.map(model => {
+        const option = document.createElement("option");
+        option.value = model.id;
+        option.textContent = model.display_name || model.name || model.id;
+        return option;
+      }));
+      if (!models.length) throw new Error("ไม่พบโมเดลที่ใช้งานได้");
+    }
+
+    function addMessage(role, content) {
+      const box = document.createElement("article");
+      box.className = "message";
+      box.innerHTML = `<div class="role"></div><div class="content"></div>`;
+      box.querySelector(".role").textContent = role === "user" ? "คุณ" : "AskMe";
+      box.querySelector(".content").textContent = content;
+      messagesEl.append(box);
+      return box.querySelector(".content");
+    }
+
+    async function sendMessage() {
+      const text = promptEl.value.trim();
+      if (!text) return;
+      sendEl.disabled = true;
+      promptEl.value = "";
+      state.messages.push({ role: "user", content: text });
+      addMessage("user", text);
+      const assistant = addMessage("assistant", "กำลังตอบ...");
+      try {
+        const body = { model: modelEl.value, stream: true, max_tokens: 1024, temperature: 0.7, messages: state.messages };
+        if (state.sessionId) body.session_id = state.sessionId;
+        const response = await fetch(`${BASE_URL}/api/v1/chat-api/chat/completions`, {
+          method: "POST",
+          headers: { Authorization: `Bearer ${state.token}`, "Content-Type": "application/json", Accept: "text/event-stream" },
+          body: JSON.stringify(body)
+        });
+        if (!response.ok) throw new Error(errorMessage(await response.json(), `คำขอล้มเหลว (${response.status})`));
+        state.sessionId = response.headers.get("X-Session-Id") || state.sessionId;
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let buffer = "", answer = "";
+        while (true) {
+          const chunk = await reader.read();
+          if (chunk.done) break;
+          buffer += decoder.decode(chunk.value, { stream: true });
+          const lines = buffer.split("\n");
+          buffer = lines.pop();
+          for (const line of lines) {
+            if (!line.startsWith("data:")) continue;
+            const value = line.slice(5).trim();
+            if (value === "[DONE]") continue;
+            try { answer += JSON.parse(value).choices?.[0]?.delta?.content || ""; } catch (_) { /* incomplete event */ }
+            assistant.textContent = answer || "กำลังตอบ...";
+          }
+        }
+        state.messages.push({ role: "assistant", content: answer });
+      } catch (error) {
+        assistant.textContent = error.message;
+        assistant.parentElement.classList.add("error");
+      } finally { sendEl.disabled = false; }
+    }
+
+    sendEl.addEventListener("click", sendMessage);
+    promptEl.addEventListener("keydown", event => { if (event.key === "Enter" && (event.ctrlKey || event.metaKey)) sendMessage(); });
+    (async () => {
+      try {
+        if (!email || !password) throw new Error("ต้องระบุอีเมลและรหัสผ่าน");
+        await login();
+        await loadModels();
+        modelEl.disabled = false;
+        sendEl.disabled = false;
+        statusEl.textContent = "เข้าสู่ระบบแล้ว · กด Ctrl/Cmd + Enter เพื่อส่ง";
+      } catch (error) { statusEl.textContent = error.message; statusEl.className = "error"; }
+    })();
+  </script>
+</body>
+</html>

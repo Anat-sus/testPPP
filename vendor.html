@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ร้านค้า | เสียงสารคาม</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script>tailwind.config = { theme: { extend: { fontFamily: { kanit: ['Kanit', 'sans-serif'] }, colors: { brand: { orange: '#e05a47', teal: '#168b82', cream: '#fffaf3', ink: '#172033' } } } } };</script>
+  <style>
+    body { font-family: 'Kanit', sans-serif; background: #172033; }
+    .app { min-height: 844px; max-width: 430px; background: #f8fafc; box-shadow: 0 24px 70px #0008; }
+    .toast { transform: translateY(120px); transition: transform .25s ease; }
+    .toast.show { transform: translateY(0); }
+  </style>
+</head>
+<body class="sm:p-6 flex justify-center">
+  <div class="app w-full sm:rounded-[32px] overflow-hidden relative">
+    <main class="p-5 pb-24">
+      <header class="flex justify-between items-center pt-3 mb-5"><div class="flex gap-3 items-center"><div class="h-12 w-12 rounded-2xl bg-amber-300 grid place-items-center text-2xl">👵</div><div><b class="text-brand-ink">แม่บัว ร้านตำซั่ว</b><span class="block text-xs text-emerald-600">● เปิดร้านอยู่</span></div></div><a href="testweb.html" class="rounded-full bg-white border px-3 py-2 text-xs"><i class="fa-solid fa-repeat"></i></a></header>
+      <div class="rounded-3xl bg-brand-ink p-5 text-white shadow-lg mb-5"><small class="text-slate-300">ยอดขายวันนี้</small><strong class="block text-4xl text-amber-300">1,450 <small class="text-base">บาท</small></strong><span class="text-xs text-slate-300">ขายประมาณ 28 จาน · กำไร 620 บาท</span></div>
+      <button id="record-btn" class="w-full rounded-3xl border-2 border-dashed border-brand-orange bg-orange-50 p-5 text-center mb-4"><span class="mx-auto mb-2 grid h-16 w-16 place-items-center rounded-full bg-brand-orange text-2xl text-white shadow-lg"><i id="record-icon" class="fa-solid fa-microphone"></i></span><b class="block text-brand-ink">กดแล้วพูด เพื่อบันทึกบัญชี</b><small class="text-slate-500">เช่น “ซื้อวัตถุดิบห้าร้อยบาท”</small></button>
+      <div class="grid grid-cols-2 gap-3"><button id="story-btn" class="rounded-2xl bg-white p-4 text-left border"><i class="fa-solid fa-bullhorn text-xl text-brand-orange"></i><b class="block text-sm mt-2">เล่าเรื่องร้าน</b><small class="text-xs text-slate-400">อัดเสียงโปรโมท</small></button><a href="vendor-finance.html" class="rounded-2xl bg-white p-4 text-left border"><i class="fa-solid fa-chart-line text-xl text-emerald-600"></i><b class="block text-sm mt-2">สรุปการเงิน</b><small class="text-xs text-slate-400">ดูรายรับและกำไร</small></a></div>
+      <div class="mt-4 rounded-2xl bg-amber-100 p-4 text-sm text-amber-900"><b>💡 เคล็ดลับวันนี้</b><p class="mt-1">พรุ่งนี้มีงานรับปริญญา มมส. เตรียมวัตถุดิบเพิ่มได้เลย!</p></div>
+    </main>
+    <div id="toast" class="toast fixed bottom-5 left-1/2 z-50 -translate-x-1/2 rounded-full bg-brand-ink px-5 py-3 text-sm text-white shadow-xl"></div>
+  </div>
+  <script>
+    const toastEl = document.querySelector('#toast');
+    function toast(message) { toastEl.textContent = message; toastEl.classList.add('show'); clearTimeout(toast.timer); toast.timer = setTimeout(() => toastEl.classList.remove('show'), 2600); }
+    let recording = false;
+    document.querySelector('#record-btn').addEventListener('click', event => { recording = !recording; event.currentTarget.classList.toggle('bg-red-50', recording); document.querySelector('#record-icon').className = recording ? 'fa-solid fa-stop' : 'fa-solid fa-microphone'; toast(recording ? 'กำลังฟังอยู่... พูดรายการได้เลย' : 'บันทึกรายการแล้ว: ยอดขาย 450 บาท'); });
+    document.querySelector('#story-btn').addEventListener('click', () => toast('เปิดโหมดอัดเสียงเล่าเรื่องร้านแล้ว 🎙️'));
+  </script>
+</body>
+</html>

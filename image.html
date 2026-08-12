@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AskMe Image Generator</title>
+  <style>
+    :root { color-scheme: dark; font-family: system-ui, sans-serif; }
+    body { margin: 0; background: #10131a; color: #eef2ff; }
+    main { width: min(900px, calc(100% - 32px)); margin: 32px auto; }
+    .panel { display: grid; gap: 14px; padding: 18px; background: #191e29; border: 1px solid #30394b; border-radius: 14px; }
+    label { color: #aeb9d0; font-size: .92rem; }
+    textarea, input, select, button { font: inherit; border-radius: 9px; border: 1px solid #3c4962; padding: 10px; }
+    textarea, input, select { background: #0f141e; color: #fff; }
+    textarea { min-height: 110px; resize: vertical; }
+    button { background: #6d63ff; color: #fff; border: 0; cursor: pointer; }
+    button:disabled { opacity: .5; cursor: wait; }
+    #status { min-height: 1.4em; color: #aeb9d0; }
+    .error { color: #ff9b9b !important; }
+    #previews { display: flex; flex-wrap: wrap; gap: 10px; }
+    #previews img { width: 130px; height: 130px; object-fit: cover; border-radius: 9px; border: 1px solid #3c4962; }
+    #result { margin-top: 18px; display: grid; gap: 10px; }
+    #result img { max-width: 100%; border-radius: 12px; border: 1px solid #3c4962; }
+    #url { overflow-wrap: anywhere; color: #aeb9d0; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>AskMe Image Generator</h1>
+    <p id="status">กำลังเข้าสู่ระบบ...</p>
+    <section class="panel">
+      <label for="files">รูปอ้างอิง (เลือกได้ไม่เกิน 2 รูป)</label>
+      <input id="files" type="file" accept="image/*" multiple>
+      <div id="previews"></div>
+      <label for="prompt">Prompt</label>
+      <textarea id="prompt" placeholder="อธิบายภาพที่ต้องการสร้าง..."></textarea>
+      <label for="size">ขนาดภาพ</label>
+      <select id="size">
+        <option value="768x1344">768 × 1344</option>
+        <option value="1344x768">1344 × 768</option>
+        <option value="1024x1024">1024 × 1024</option>
+      </select>
+      <button id="generate" disabled>สร้างภาพ</button>
+    </section>
+    <section id="result"></section>
+  </main>
+  <script>
+    const BASE_URL = "https://itmsuhackathon.askme.co.th";
+    const MODEL_ID = "gemini-3.1-flash-image-preview";
+    const EMAIL = "67011212102@msu.ac.th";
+    const PASSWORD = "Ablue@2005";
+    const state = { token: "", files: [], sessionId: "" };
+    const statusEl = document.querySelector("#status");
+    const filesEl = document.querySelector("#files");
+    const previewsEl = document.querySelector("#previews");
+    const promptEl = document.querySelector("#prompt");
+    const sizeEl = document.querySelector("#size");
+    const generateEl = document.querySelector("#generate");
+    const resultEl = document.querySelector("#result");
+
+    function errorMessage(data, fallback) {
+      if (data?.error && typeof data.error === "object") return data.error.message || data.error.code || fallback;
+      return data?.message || (typeof data?.error === "string" ? data.error : fallback);
+    }
+
+    async function login() {
+      const response = await fetch(`${BASE_URL}/api/v1/auth/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: EMAIL, password: PASSWORD })
+      });
+      const data = await response.json();
+      if (!response.ok || !data.access_token) throw new Error(errorMessage(data, "เข้าสู่ระบบไม่สำเร็จ"));
+      state.token = data.access_token;
+    }
+
+    async function createSession() {
+      const response = await fetch(`${BASE_URL}/api/v1/chat/sessions`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${state.token}`,
+          "Content-Type": "application/json",
+          "X-Client-Type": "web"
+        },
+        body: JSON.stringify({ model_id: MODEL_ID })
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(errorMessage(data, "สร้างเซสชันไม่สำเร็จ"));
+      state.sessionId = data.id || data.session_id || data.data?.id;
+      if (!state.sessionId) throw new Error("ไม่พบ session ID");
+    }
+
+    function toBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(String(reader.result).split(",")[1]);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function buildFileUrl(pathOrUrl) {
+      if (!pathOrUrl) return null;
+      if (/^https?:\/\//i.test(pathOrUrl)) {
+        if (pathOrUrl.includes("/api/v1/chat/files/")) return pathOrUrl;
+        return `${BASE_URL}/api/v1/chat/files/${pathOrUrl.replace(/^https?:\/\/[^/]+\/?/, "")}`;
+      }
+      if (pathOrUrl.startsWith("/api/v1/chat/files/")) return `${BASE_URL}${pathOrUrl}`;
+      if (pathOrUrl.startsWith("/")) return `${BASE_URL}${pathOrUrl}`;
+      return `${BASE_URL}/api/v1/chat/files/${pathOrUrl.replace(/^\/+/, "")}`;
+    }
+
+    function findImagePath(data) {
+      const candidates = [
+        data?.url,
+        data?.file_url,
+        data?.image_url,
+        data?.path,
+        data?.file?.url,
+        data?.file?.path,
+        data?.data?.url,
+        data?.data?.file_url,
+        data?.data?.image_url,
+        data?.data?.path,
+        data?.data?.file?.url,
+        data?.data?.file?.path,
+        data?.result?.url,
+        data?.result?.file_url,
+        data?.result?.image_url,
+        data?.result?.path,
+        data?.result?.file?.url,
+        data?.result?.file?.path
+      ];
+      const directPath = candidates.find(value => typeof value === "string" && value.trim());
+      if (directPath) return directPath;
+
+      const json = JSON.stringify(data);
+      const urlMatch = json.match(/(?:https?:\/\/[^"\s]+|(?:[A-Za-z0-9_-]+\/)+generated_[^"\s]+)/i);
+      return urlMatch ? urlMatch[0].replace(/\\\//g, "/") : null;
+    }
+
+    filesEl.addEventListener("change", () => {
+      state.files = Array.from(filesEl.files).slice(0, 2);
+      if (filesEl.files.length > 2) statusEl.textContent = "เลือกได้ไม่เกิน 2 รูป ระบบใช้ 2 รูปแรก";
+      previewsEl.replaceChildren(...state.files.map(file => {
+        const image = document.createElement("img");
+        image.alt = file.name;
+        image.src = URL.createObjectURL(file);
+        return image;
+      }));
+    });
+
+    generateEl.addEventListener("click", async () => {
+      const prompt = promptEl.value.trim();
+      if (!prompt) { statusEl.textContent = "กรุณาระบุ prompt"; statusEl.className = "error"; return; }
+      generateEl.disabled = true;
+      statusEl.className = "";
+      statusEl.textContent = "กำลังสร้างภาพ...";
+      resultEl.replaceChildren();
+      try {
+        if (!state.sessionId) await createSession();
+        const inputImages = await Promise.all(state.files.map(toBase64));
+        const response = await fetch(`${BASE_URL}/api/v1/chat/sessions/${state.sessionId}/images/generate`, {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${state.token}`,
+            "Content-Type": "application/json",
+            "X-Client-Type": "web"
+          },
+          body: JSON.stringify({ prompt, size: sizeEl.value, model_id: MODEL_ID, input_images: inputImages })
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(errorMessage(data, "สร้างภาพไม่สำเร็จ"));
+        const imagePath = findImagePath(data);
+        if (!imagePath) {
+          throw new Error(`ไม่พบ URL ของภาพที่สร้าง: ${JSON.stringify(data)}`);
+        }
+        const imageUrl = buildFileUrl(imagePath);
+        const imageResponse = await fetch(imageUrl, { headers: { Authorization: `Bearer ${state.token}`, Accept: "*/*" } });
+        if (!imageResponse.ok) throw new Error(`โหลดภาพไม่สำเร็จ (${imageResponse.status})`);
+        const image = document.createElement("img");
+        image.alt = prompt;
+        image.src = URL.createObjectURL(await imageResponse.blob());
+        const link = document.createElement("a");
+        link.id = "url";
+        link.href = imageUrl;
+        link.target = "_blank";
+        link.textContent = imageUrl;
+        resultEl.append(image, link);
+        statusEl.textContent = "สร้างภาพสำเร็จ";
+      } catch (error) {
+        statusEl.textContent = error.message;
+        statusEl.className = "error";
+      } finally { generateEl.disabled = false; }
+    });
+
+    (async () => {
+      try {
+        await login();
+        generateEl.disabled = false;
+        statusEl.textContent = "เข้าสู่ระบบแล้ว พร้อมสร้างภาพ";
+      } catch (error) {
+        statusEl.textContent = error.message;
+        statusEl.className = "error";
+      }
+    })();
+  </script>
+</body>
+</html>

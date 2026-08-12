@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>รายละเอียดร้าน | เสียงสารคาม</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script>tailwind.config = { theme: { extend: { fontFamily: { kanit: ['Kanit', 'sans-serif'] }, colors: { brand: { orange: '#e05a47', teal: '#168b82', cream: '#fffaf3', ink: '#172033' } } } } };</script>
+  <style>
+    body { font-family: 'Kanit', sans-serif; background: #172033; }
+    .app { min-height: 844px; max-width: 430px; background: #fffaf3; box-shadow: 0 24px 70px #0008; }
+    .playing { animation: pulse 1.5s infinite; }
+    @keyframes pulse { 50% { transform: scale(1.06); } }
+    .toast { transform: translateY(120px); transition: transform .25s ease; }
+    .toast.show { transform: translateY(0); }
+  </style>
+</head>
+<body class="sm:p-6 flex justify-center">
+  <div class="app w-full sm:rounded-[32px] overflow-hidden relative">
+    <main class="p-5 pb-24">
+      <a href="customer.html" class="inline-block mb-4 rounded-full bg-white px-4 py-2 text-sm shadow-sm"><i class="fa-solid fa-arrow-left mr-2"></i>ย้อนกลับ</a>
+      <div class="relative overflow-hidden rounded-3xl shadow-lg"><img id="cover" class="h-52 w-full object-cover"><div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 p-5 text-white"><span class="rounded-full bg-brand-orange px-2 py-1 text-xs">ร้านเด็ดหน้า มมส.</span><h1 id="store-name" class="text-2xl font-bold mt-2"></h1><p class="text-xs text-slate-200">สูตร 30 ปี · เปิด 16:00 - 22:00 น.</p></div></div>
+      <div class="mt-4 rounded-3xl border-2 border-amber-300 bg-amber-100 p-5 text-center"><p class="text-xs text-amber-800">🎧 เรื่องเล่าจากเจ้าของร้าน</p><button id="audio-btn" class="my-3 h-14 w-14 rounded-full bg-brand-orange text-xl text-white shadow-lg"><i id="audio-icon" class="fa-solid fa-play"></i></button><p id="quote" class="font-bold text-brand-ink"></p><div class="mt-3 h-2 overflow-hidden rounded-full bg-amber-200"><div id="audio-progress" class="h-full w-0 bg-brand-orange transition-all"></div></div></div>
+      <div class="grid grid-cols-2 gap-3 mt-4"><div class="rounded-2xl bg-white p-4 text-center border"><small class="text-slate-400">ผู้ฟัง</small><b class="block text-xl text-brand-orange">1,250</b></div><div class="rounded-2xl bg-white p-4 text-center border"><small class="text-slate-400">ร้านโปรด</small><b class="block text-xl text-emerald-600">300</b></div></div>
+      <button id="favorite-btn" class="mt-4 w-full rounded-2xl border border-brand-orange bg-white py-3 font-semibold text-brand-orange"><i class="fa-regular fa-heart mr-2"></i>บันทึกร้านโปรด</button>
+      <div class="mt-4 rounded-2xl bg-white p-4 border"><h2 class="font-bold mb-2">💬 รีวิวจากลูกค้า</h2><p class="rounded-xl bg-slate-50 p-3 text-sm text-slate-600">“ลาบนัวมาก ยายใจดีให้เยอะ สมคำเล่าในคลิป!”</p><p class="mt-2 rounded-xl bg-slate-50 p-3 text-sm text-slate-600">“ฟังเสียงยายแล้วต้องเดินตามมาซื้อ”</p></div>
+    </main>
+    <div id="toast" class="toast fixed bottom-5 left-1/2 z-50 -translate-x-1/2 rounded-full bg-brand-ink px-5 py-3 text-sm text-white shadow-xl"></div>
+  </div>
+  <script>
+    const stores = [
+      { name: 'ลาบยายคำ', image: 'https://images.unsplash.com/photo-1555126634-323283e090fa?w=700&auto=format&fit=crop&q=80', quote: '“ขายลาบมาสามสิบปีแล้วน้อ...”' },
+      { name: 'ไก่ย่างวิเชียร พ่อเสก', image: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=700&auto=format&fit=crop&q=80', quote: '“สูตรนี้ตำเอง น้ำจิ้มแจ่วส้ม...”' },
+      { name: 'ข้าวจี่คุณยายทอง', image: 'https://images.unsplash.com/photo-1547592180-85f173990554?w=700&auto=format&fit=crop&q=80', quote: '“ข้าวจี่ร้อนๆ กินนำกันเด้อ”' }
+    ];
+    const store = stores[Number(sessionStorage.getItem('selectedStore')) || 0];
+    document.querySelector('#cover').src = store.image;
+    document.querySelector('#store-name').textContent = store.name;
+    document.querySelector('#quote').textContent = store.quote;
+    const toastEl = document.querySelector('#toast');
+    function toast(message) { toastEl.textContent = message; toastEl.classList.add('show'); clearTimeout(toast.timer); toast.timer = setTimeout(() => toastEl.classList.remove('show'), 2600); }
+    let timer;
+    document.querySelector('#audio-btn').addEventListener('click', event => {
+      const button = event.currentTarget;
+      const icon = document.querySelector('#audio-icon');
+      const progress = document.querySelector('#audio-progress');
+      if (button.classList.contains('playing')) { button.classList.remove('playing'); icon.className = 'fa-solid fa-play'; clearInterval(timer); return; }
+      button.classList.add('playing'); icon.className = 'fa-solid fa-pause'; let value = 0; timer = setInterval(() => { value += 2.22; progress.style.width = `${value}%`; if (value >= 100) { clearInterval(timer); button.classList.remove('playing'); icon.className = 'fa-solid fa-play'; } }, 1000);
+    });
+    document.querySelector('#favorite-btn').addEventListener('click', event => { event.currentTarget.innerHTML = '<i class="fa-solid fa-heart mr-2"></i>บันทึกเป็นร้านโปรดแล้ว'; event.currentTarget.classList.add('bg-orange-50'); toast('บันทึกร้านโปรดแล้ว ❤️'); });
+  </script>
+</body>
+</html>

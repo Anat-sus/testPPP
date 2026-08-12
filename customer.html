@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ค้นหาร้าน | เสียงสารคาม</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = { theme: { extend: { fontFamily: { kanit: ['Kanit', 'sans-serif'] }, colors: { brand: { orange: '#e05a47', teal: '#168b82', cream: '#fffaf3', ink: '#172033' } } } } };
+  </script>
+  <style>
+    body { font-family: 'Kanit', sans-serif; background: #172033; }
+    .app { min-height: 844px; max-width: 430px; background: #fffaf3; box-shadow: 0 24px 70px #0008; }
+    .toast { transform: translateY(120px); transition: transform .25s ease; }
+    .toast.show { transform: translateY(0); }
+  </style>
+</head>
+<body class="sm:p-6 flex justify-center">
+  <div class="app w-full sm:rounded-[32px] overflow-hidden relative">
+    <main class="p-5 pb-24">
+      <header class="flex justify-between items-center pt-3 mb-5">
+        <div><span class="text-xs font-bold tracking-widest text-brand-orange">MAHA SARAKHAM</span><h1 class="text-2xl font-bold text-brand-ink">วันนี้กินอะไรดี? 🌾</h1></div>
+        <a href="testweb.html" class="rounded-full bg-white border px-3 py-2 text-xs shadow-sm"><i class="fa-solid fa-repeat"></i></a>
+      </header>
+      <div class="relative mb-4"><input id="search" class="w-full rounded-2xl border-0 bg-white py-3.5 pl-11 pr-4 shadow-sm outline-none focus:ring-2 focus:ring-brand-orange" placeholder="ค้นหาร้าน อาหาร หรือเสียงเล่าเรื่อง"><i class="fa-solid fa-magnifying-glass absolute left-4 top-4 text-slate-400"></i></div>
+      <div class="grid grid-cols-2 gap-3 mb-5"><button id="map-btn" class="rounded-2xl bg-amber-500 p-3 text-white shadow-md"><i class="fa-solid fa-location-dot mr-1"></i> ร้านใกล้ตัว</button><button id="random-btn" class="rounded-2xl bg-brand-teal p-3 text-white shadow-md"><i class="fa-solid fa-shuffle mr-1"></i> สุ่มร้านให้ฉัน</button></div>
+      <div class="rounded-3xl bg-gradient-to-r from-brand-orange to-amber-400 p-5 text-white shadow-lg mb-6"><span class="rounded-full bg-white/20 px-3 py-1 text-xs">🎉 งานบุญใกล้นี้</span><p class="text-xs mt-4 text-orange-50">12 - 15 ก.พ.</p><h2 class="text-xl font-bold">งานบุญเบิกฟ้า มหาสารคาม</h2><p class="text-sm opacity-90 mt-1">รวมร้านหาบเร่โบราณ 15 ร้าน พร้อมเรื่องเล่าจากเจ้าของร้าน</p><button id="festival-btn" class="mt-4 rounded-xl bg-white px-4 py-2 text-xs font-bold text-brand-orange">ดูรายละเอียดงาน</button></div>
+      <div class="flex justify-between items-center mb-3"><h2 class="font-bold text-lg text-brand-ink">🔥 ฮิตติดหูสัปดาห์นี้</h2><button id="all-btn" class="text-xs text-brand-orange">ดูทั้งหมด</button></div>
+      <div id="store-list" class="space-y-3"></div>
+    </main>
+    <nav class="fixed bottom-0 left-1/2 z-20 flex w-full max-w-[430px] -translate-x-1/2 justify-around border-t bg-white/95 px-5 py-3 backdrop-blur"><a href="customer.html" class="flex flex-col items-center gap-1 text-xs text-brand-orange"><i class="fa-solid fa-house text-lg"></i>หน้าแรก</a><button id="nav-map" class="flex flex-col items-center gap-1 text-xs"><i class="fa-solid fa-map text-lg"></i>แผนที่</button><button id="nav-favorite" class="flex flex-col items-center gap-1 text-xs"><i class="fa-solid fa-heart text-lg"></i>ร้านโปรด</button></nav>
+    <div id="toast" class="toast fixed bottom-5 left-1/2 z-50 -translate-x-1/2 rounded-full bg-brand-ink px-5 py-3 text-sm text-white shadow-xl"></div>
+  </div>
+  <script>
+    const stores = [
+      { name: 'ลาบยายคำ (สูตร 30 ปี)', place: 'หน้า มมส. เก่า · อาหารอีสานแท้', distance: '400 ม.', image: 'https://images.unsplash.com/photo-1555126634-323283e090fa?w=300&auto=format&fit=crop&q=80', quote: 'ขายลาบมาสามสิบปีแล้วน้อ...' },
+      { name: 'ไก่ย่างวิเชียร พ่อเสก', place: 'ย่านท่าขอนยาง · ไก่หมักสมุนไพร', distance: '1.2 กม.', image: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=300&auto=format&fit=crop&q=80', quote: 'สูตรนี้ตำเอง น้ำจิ้มแจ่วส้ม...' },
+      { name: 'ข้าวจี่คุณยายทอง', place: 'ตลาดโต้รุ่ง · หอมเตาถ่าน', distance: '1.8 กม.', image: 'https://images.unsplash.com/photo-1547592180-85f173990554?w=300&auto=format&fit=crop&q=80', quote: 'ข้าวจี่ร้อนๆ กินนำกันเด้อ' }
+    ];
+    const toastEl = document.querySelector('#toast');
+    function toast(message) { toastEl.textContent = message; toastEl.classList.add('show'); clearTimeout(toast.timer); toast.timer = setTimeout(() => toastEl.classList.remove('show'), 2600); }
+    function renderStores(items = stores) {
+      document.querySelector('#store-list').innerHTML = items.length ? items.map((store, index) => `<button class="store-card w-full rounded-2xl bg-white p-3 text-left shadow-sm border flex gap-3 hover:border-brand-orange transition" data-index="${index}"><img src="${store.image}" class="h-20 w-20 rounded-xl object-cover"><span class="min-w-0 flex-1"><span class="flex justify-between gap-2"><b class="truncate text-brand-ink">${store.name}</b><small class="whitespace-nowrap text-slate-400">${store.distance}</small></span><small class="block text-slate-500 mb-2">${store.place}</small><span class="block truncate rounded-lg bg-amber-50 px-2 py-1 text-xs text-amber-900"><i class="fa-solid fa-volume-high text-brand-orange mr-1"></i>${store.quote}</span></span></button>`).join('') : '<div class="rounded-2xl bg-white p-5 text-center text-slate-500">ไม่พบร้านที่ค้นหา</div>';
+      document.querySelectorAll('.store-card').forEach(card => card.addEventListener('click', () => { sessionStorage.setItem('selectedStore', card.dataset.index); location.href = 'customer-detail.html'; }));
+    }
+    document.querySelector('#search').addEventListener('input', event => { const term = event.target.value.toLowerCase(); renderStores(stores.filter(store => `${store.name} ${store.place} ${store.quote}`.toLowerCase().includes(term))); });
+    document.querySelector('#map-btn').addEventListener('click', () => toast('เปิดแผนที่ร้านใกล้ตัวแล้ว 📍'));
+    document.querySelector('#random-btn').addEventListener('click', () => { sessionStorage.setItem('selectedStore', Math.floor(Math.random() * stores.length)); location.href = 'customer-detail.html'; });
+    document.querySelector('#festival-btn').addEventListener('click', () => toast('งานบุญเบิกฟ้า: 12 - 15 กุมภาพันธ์ ณ ลานวัฒนธรรมเมืองสารคาม'));
+    document.querySelector('#all-btn').addEventListener('click', () => { document.querySelector('#search').value = ''; renderStores(); toast('แสดงร้านทั้งหมดแล้ว'); });
+    document.querySelector('#nav-map').addEventListener('click', () => toast('ฟีเจอร์แผนที่พร้อมใช้งานเร็วๆ นี้ 📍'));
+    document.querySelector('#nav-favorite').addEventListener('click', () => toast('ยังไม่มีร้านโปรดที่บันทึกไว้'));
+    renderStores();
+  </script>
+</body>
+</html>
