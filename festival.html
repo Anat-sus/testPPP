@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>งานบุญเบิกฟ้า | เสียงสารคาม</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { kanit: ['Kanit', 'sans-serif'] },
+          colors: {
+            brand: {
+              orange: '#e05a47',
+              teal: '#168b82',
+              cream: '#fffaf3',
+              ink: '#172033'
+            }
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    body {
+      font-family: 'Kanit', sans-serif;
+      background: #172033;
+    }
+
+    .app {
+      min-height: 844px;
+      max-width: 430px;
+      background: #fffaf3;
+      box-shadow: 0 24px 70px #0008;
+    }
+  </style>
+</head>
+<body class="sm:p-6 flex justify-center">
+  <div class="app w-full sm:rounded-[32px] overflow-hidden relative">
+    <main class="p-5 pb-24">
+      <a href="customer.html" class="inline-block mb-4 rounded-full bg-white px-4 py-2 text-sm shadow-sm">
+        <i class="fa-solid fa-arrow-left mr-2"></i>ย้อนกลับ
+      </a>
+
+      <div class="overflow-hidden rounded-3xl bg-gradient-to-br from-brand-orange to-amber-400 text-white shadow-lg">
+        <div class="p-5">
+          <span class="rounded-full bg-white/20 px-3 py-1 text-xs font-semibold">🎉 งานบุญใกล้นี้</span>
+          <p class="mt-5 text-sm text-orange-50">12 - 15 กุมภาพันธ์</p>
+          <h1 class="mt-1 text-2xl font-bold">งานบุญเบิกฟ้า มหาสารคาม</h1>
+          <p class="mt-2 text-sm text-orange-50">เทศกาลวัฒนธรรม อาหารพื้นบ้าน และเรื่องเล่าจากพ่อค้าแม่ค้าเมืองสารคาม</p>
+        </div>
+        <div class="grid grid-cols-3 border-t border-white/20 bg-black/10 text-center">
+          <div class="p-3"><b class="block text-xl">15</b><small class="text-xs text-orange-50">ร้านเข้าร่วม</small></div>
+          <div class="border-x border-white/20 p-3"><b class="block text-xl">4</b><small class="text-xs text-orange-50">วันจัดงาน</small></div>
+          <div class="p-3"><b class="block text-xl">ฟรี</b><small class="text-xs text-orange-50">เข้าชมงาน</small></div>
+        </div>
+      </div>
+
+      <section class="mt-5 rounded-3xl bg-white p-5 shadow-sm border">
+        <h2 class="font-bold text-lg text-brand-ink">รายละเอียดงาน</h2>
+        <div class="mt-4 space-y-3 text-sm text-slate-600">
+          <p><i class="fa-regular fa-calendar text-brand-orange mr-2"></i>12 - 15 กุมภาพันธ์ เวลา 10:00 - 21:00 น.</p>
+          <p><i class="fa-solid fa-location-dot text-brand-orange mr-2"></i>ลานวัฒนธรรมเมืองสารคาม</p>
+          <p><i class="fa-solid fa-ticket text-brand-orange mr-2"></i>เข้าชมฟรี ไม่มีค่าใช้จ่าย</p>
+        </div>
+      </section>
+
+      <section class="mt-4 rounded-3xl bg-amber-100 p-5 text-amber-950">
+        <h2 class="font-bold text-lg">กิจกรรมภายในงาน</h2>
+        <ul class="mt-3 space-y-2 text-sm">
+          <li><i class="fa-solid fa-check mr-2 text-brand-orange"></i>ชิมอาหารหาบเร่โบราณจากร้านท้องถิ่น</li>
+          <li><i class="fa-solid fa-check mr-2 text-brand-orange"></i>ฟังเรื่องเล่าจากเจ้าของร้านตัวจริง</li>
+          <li><i class="fa-solid fa-check mr-2 text-brand-orange"></i>การแสดงดนตรีพื้นบ้านและหมอลำ</li>
+          <li><i class="fa-solid fa-check mr-2 text-brand-orange"></i>เวิร์กช็อปทำอาหารอีสาน</li>
+        </ul>
+      </section>
+
+      <section class="mt-4">
+        <div class="mb-3 flex items-center justify-between">
+          <h2 class="font-bold text-lg text-brand-ink">ร้านที่เข้าร่วมงาน</h2>
+          <span class="text-xs text-slate-500">15 ร้าน</span>
+        </div>
+        <div id="vendor-list" class="space-y-3"></div>
+      </section>
+
+      <button id="map-btn" class="mt-5 w-full rounded-2xl bg-brand-ink py-3 font-semibold text-white shadow-md">
+        <i class="fa-solid fa-map-location-dot mr-2"></i>ดูตำแหน่งจัดงานบนแผนที่
+      </button>
+    </main>
+  </div>
+
+  <script>
+    const vendors = [
+      { name: 'ลาบยายคำ', menu: 'ลาบอีสานสูตร 30 ปี', image: 'https://images.unsplash.com/photo-1555126634-323283e090fa?w=300&auto=format&fit=crop&q=80' },
+      { name: 'ไก่ย่างวิเชียร พ่อเสก', menu: 'ไก่ย่างสมุนไพร น้ำจิ้มแจ่ว', image: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=300&auto=format&fit=crop&q=80' },
+      { name: 'ข้าวจี่คุณยายทอง', menu: 'ข้าวจี่เตาถ่านร้อนๆ', image: 'https://images.unsplash.com/photo-1547592180-85f173990554?w=300&auto=format&fit=crop&q=80' }
+    ];
+
+    const vendorList = document.querySelector('#vendor-list');
+    vendorList.innerHTML = vendors.map((vendor, index) => `
+      <button class="vendor-card flex w-full items-center gap-3 rounded-2xl border bg-white p-3 text-left shadow-sm" data-index="${index}">
+        <img src="${vendor.image}" alt="${vendor.name}" class="h-16 w-16 rounded-xl object-cover">
+        <span class="min-w-0 flex-1">
+          <b class="block truncate text-brand-ink">${vendor.name}</b>
+          <small class="block text-slate-500">${vendor.menu}</small>
+          <small class="mt-1 block text-brand-orange"><i class="fa-solid fa-volume-high mr-1"></i>ฟังเรื่องเล่าของร้าน</small>
+        </span>
+        <i class="fa-solid fa-chevron-right text-slate-400"></i>
+      </button>
+    `).join('');
+
+    document.querySelectorAll('.vendor-card').forEach(card => {
+      card.addEventListener('click', () => {
+        sessionStorage.setItem('selectedStore', card.dataset.index);
+        location.href = 'customer-detail.html';
+      });
+    });
+
+    document.querySelector('#map-btn').addEventListener('click', () => {
+      location.href = 'customer-map.html';
+    });
+  </script>
+</body>
+</html>

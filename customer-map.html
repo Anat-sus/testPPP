@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>แผนที่ร้าน | เสียงสารคาม</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { kanit: ['Kanit', 'sans-serif'] },
+          colors: {
+            brand: {
+              orange: '#e05a47',
+              teal: '#168b82',
+              cream: '#fffaf3',
+              ink: '#172033'
+            }
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    body {
+      font-family: 'Kanit', sans-serif;
+      background: #172033;
+    }
+
+    .app {
+      min-height: 844px;
+      max-width: 430px;
+      background: #fffaf3;
+      box-shadow: 0 24px 70px #0008;
+    }
+
+    .map-grid {
+      background-color: #dcebdc;
+      background-image:
+        linear-gradient(28deg, transparent 46%, #b9d4bb 47%, #b9d4bb 49%, transparent 50%),
+        linear-gradient(115deg, transparent 47%, #c7dfc9 48%, #c7dfc9 50%, transparent 51%),
+        linear-gradient(#c4dcc7 1px, transparent 1px),
+        linear-gradient(90deg, #c4dcc7 1px, transparent 1px);
+      background-size: 155px 120px, 180px 150px, 42px 42px, 42px 42px;
+    }
+
+    .map-road {
+      position: absolute;
+      height: 14px;
+      border-radius: 999px;
+      background: #f8f1dc;
+      border: 2px solid #d7cda9;
+      transform: rotate(-18deg);
+    }
+
+    .map-road.one {
+      width: 145%;
+      left: -20%;
+      top: 38%;
+    }
+
+    .map-road.two {
+      width: 120%;
+      left: -8%;
+      top: 64%;
+      transform: rotate(27deg);
+    }
+
+    .map-road.three {
+      width: 100%;
+      left: 15%;
+      top: 18%;
+      transform: rotate(72deg);
+    }
+
+    .map-pin {
+      position: absolute;
+      z-index: 2;
+      width: 42px;
+      height: 42px;
+      display: grid;
+      place-items: center;
+      color: white;
+      background: #e05a47;
+      border: 4px solid white;
+      border-radius: 50% 50% 50% 0;
+      transform: rotate(-45deg);
+      box-shadow: 0 5px 12px #0004;
+      cursor: pointer;
+    }
+
+    .map-pin i {
+      transform: rotate(45deg);
+    }
+
+    .map-pin.selected {
+      background: #172033;
+      transform: rotate(-45deg) scale(1.12);
+    }
+
+    .pin-one { left: 20%; top: 27%; }
+    .pin-two { left: 63%; top: 46%; }
+    .pin-three { left: 39%; top: 70%; }
+
+    .user-location {
+      position: absolute;
+      left: 48%;
+      top: 52%;
+      z-index: 3;
+      width: 22px;
+      height: 22px;
+      border: 5px solid white;
+      border-radius: 50%;
+      background: #168b82;
+      box-shadow: 0 0 0 10px #168b8230, 0 3px 8px #0004;
+    }
+  </style>
+</head>
+<body class="sm:p-6 flex justify-center">
+  <div class="app w-full sm:rounded-[32px] overflow-hidden relative">
+    <main class="p-5 pb-24">
+      <header class="flex items-center justify-between pt-3 mb-4">
+        <a href="customer.html" class="rounded-full bg-white border px-4 py-2 text-sm shadow-sm">
+          <i class="fa-solid fa-arrow-left mr-2"></i>ย้อนกลับ
+        </a>
+        <button id="locate-btn" class="rounded-full bg-brand-teal px-4 py-2 text-sm text-white shadow-sm">
+          <i class="fa-solid fa-location-crosshairs mr-1"></i>ตำแหน่งฉัน
+        </button>
+      </header>
+
+      <div class="mb-4">
+        <span class="text-xs font-bold tracking-widest text-brand-orange">MAHA SARAKHAM</span>
+        <h1 class="text-2xl font-bold text-brand-ink">ร้านใกล้ตัวฉัน 📍</h1>
+      </div>
+
+      <div class="relative mb-4 overflow-hidden rounded-3xl border-4 border-white shadow-lg">
+        <div id="map" class="map-grid relative h-[430px] w-full">
+          <span class="map-road one"></span>
+          <span class="map-road two"></span>
+          <span class="map-road three"></span>
+          <span class="absolute left-3 top-3 rounded-xl bg-white/90 px-3 py-2 text-xs font-semibold text-slate-600 shadow-sm">แผนที่จำลอง · มหาสารคาม</span>
+          <button class="map-pin pin-one" data-index="0" aria-label="ลาบยายคำ"><i class="fa-solid fa-utensils"></i></button>
+          <button class="map-pin pin-two" data-index="1" aria-label="ไก่ย่างวิเชียร"><i class="fa-solid fa-drumstick-bite"></i></button>
+          <button class="map-pin pin-three" data-index="2" aria-label="ข้าวจี่คุณยายทอง"><i class="fa-solid fa-bowl-food"></i></button>
+          <span class="user-location" title="ตำแหน่งของคุณ"></span>
+        </div>
+      </div>
+
+      <div class="mb-3 flex items-center justify-between">
+        <h2 class="font-bold text-lg text-brand-ink">ร้านอาหารใกล้เคียง</h2>
+        <span id="result-count" class="text-xs text-slate-500">3 ร้าน</span>
+      </div>
+
+      <div id="store-list" class="space-y-3"></div>
+    </main>
+
+    <nav class="fixed bottom-0 left-1/2 z-20 flex w-full max-w-[430px] -translate-x-1/2 justify-around border-t bg-white/95 px-5 py-3 backdrop-blur">
+      <a href="customer.html" class="flex flex-col items-center gap-1 text-xs text-slate-500"><i class="fa-solid fa-house text-lg"></i>หน้าแรก</a>
+      <a href="customer-map.html" class="flex flex-col items-center gap-1 text-xs text-brand-orange"><i class="fa-solid fa-map text-lg"></i>แผนที่</a>
+      <button id="favorite-btn" class="flex flex-col items-center gap-1 text-xs text-slate-500"><i class="fa-solid fa-heart text-lg"></i>ร้านโปรด</button>
+    </nav>
+  </div>
+
+  <script>
+    const stores = [
+      {
+        name: 'ลาบยายคำ (สูตร 30 ปี)',
+        place: 'หน้า มมส. เก่า · อาหารอีสานแท้',
+        distance: '400 ม.',
+        image: 'https://images.unsplash.com/photo-1555126634-323283e090fa?w=300&auto=format&fit=crop&q=80',
+        quote: 'ขายลาบมาสามสิบปีแล้วน้อ...'
+      },
+      {
+        name: 'ไก่ย่างวิเชียร พ่อเสก',
+        place: 'ย่านท่าขอนยาง · ไก่หมักสมุนไพร',
+        distance: '1.2 กม.',
+        image: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=300&auto=format&fit=crop&q=80',
+        quote: 'สูตรนี้ตำเอง น้ำจิ้มแจ่วส้ม...'
+      },
+      {
+        name: 'ข้าวจี่คุณยายทอง',
+        place: 'ตลาดโต้รุ่ง · หอมเตาถ่าน',
+        distance: '1.8 กม.',
+        image: 'https://images.unsplash.com/photo-1547592180-85f173990554?w=300&auto=format&fit=crop&q=80',
+        quote: 'ข้าวจี่ร้อนๆ กินนำกันเด้อ'
+      }
+    ];
+
+    function renderStores() {
+      document.querySelector('#store-list').innerHTML = stores.map((store, index) => `
+        <button class="store-card w-full rounded-2xl bg-white p-3 text-left shadow-sm border flex gap-3 hover:border-brand-orange transition" data-index="${index}">
+          <img src="${store.image}" class="h-20 w-20 rounded-xl object-cover" alt="${store.name}">
+          <span class="min-w-0 flex-1">
+            <span class="flex justify-between gap-2">
+              <b class="truncate text-brand-ink">${store.name}</b>
+              <small class="whitespace-nowrap text-slate-400">${store.distance}</small>
+            </span>
+            <small class="block text-slate-500 mb-2">${store.place}</small>
+            <span class="block truncate rounded-lg bg-amber-50 px-2 py-1 text-xs text-amber-900">
+              <i class="fa-solid fa-volume-high text-brand-orange mr-1"></i>${store.quote}
+            </span>
+          </span>
+        </button>
+      `).join('');
+
+      document.querySelectorAll('.store-card').forEach(card => {
+        card.addEventListener('click', () => openStore(Number(card.dataset.index)));
+      });
+    }
+
+    function openStore(index) {
+      sessionStorage.setItem('selectedStore', index);
+      location.href = 'customer-detail.html';
+    }
+
+    document.querySelectorAll('.map-pin').forEach(pin => {
+      pin.addEventListener('click', () => {
+        document.querySelectorAll('.map-pin').forEach(item => item.classList.remove('selected'));
+        pin.classList.add('selected');
+        openStore(Number(pin.dataset.index));
+      });
+    });
+
+    document.querySelector('#locate-btn').addEventListener('click', () => {
+      const button = document.querySelector('#locate-btn');
+      button.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i>กำลังค้นหา';
+      setTimeout(() => {
+        button.innerHTML = '<i class="fa-solid fa-location-crosshairs mr-1"></i>ตำแหน่งฉัน';
+        alert('พบตำแหน่งจำลองของคุณแล้ว 📍');
+      }, 700);
+    });
+
+    document.querySelector('#favorite-btn').addEventListener('click', () => {
+      alert('ร้านโปรดจะแสดงในเวอร์ชันถัดไป ❤️');
+    });
+
+    renderStores();
+  </script>
+</body>
+</html>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>เสียงสารคาม | เลือกการใช้งาน</title>
+  <title>เสียงสารคาม - Maha Sarakham Voice Food Prototype</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -11,121 +11,443 @@
     tailwind.config = {
       theme: {
         extend: {
-          fontFamily: { kanit: ['Kanit', 'sans-serif'] },
           colors: {
-            brand: {
-              orange: '#e05a47',
-              teal: '#178b83',
-              navy: '#172033',
-              cream: '#fffaf3'
+            isan: {
+              orange: '#E05A47',
+              yellow: '#F4A261',
+              dark: '#2A9D8F',
+              bg: '#FAF6F0',
+              card: '#FFFFFF',
+              vendor: '#1D3557'
             }
+          },
+          fontFamily: {
+            kanit: ['Kanit', 'sans-serif']
           }
         }
       }
-    };
+    }
   </script>
   <style>
-    :root { color-scheme: light; }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      font-family: 'Kanit', sans-serif;
-      background:
-        radial-gradient(circle at 15% 10%, #f7c46b 0, transparent 24%),
-        radial-gradient(circle at 90% 90%, #2a9d8f 0, transparent 25%),
-        #172033;
-    }
-    .phone {
-      min-height: 100vh;
-      max-width: 480px;
-      background: #fffaf3;
-      overflow: hidden;
-      position: relative;
-    }
-    @media (min-width: 640px) {
-      .phone {
-        min-height: 860px;
-        margin: 24px auto;
-        border: 8px solid #0d1422;
-        border-radius: 36px;
-        box-shadow: 0 28px 80px #0008;
-      }
-    }
-    .brand-mark { animation: float 4s ease-in-out infinite; }
-    .role-card { transition: transform .2s ease, box-shadow .2s ease; }
-    .role-card:hover { transform: translateY(-4px); box-shadow: 0 16px 28px #17203318; }
-    .role-card:active { transform: scale(.98); }
-    @keyframes float { 50% { transform: translateY(-7px) rotate(3deg); } }
+    body { font-family: 'Kanit', sans-serif; background-color: #f3f4f6; }
+    .app-container { max-width: 430px; min-height: 844px; margin: 0 auto; background: #FAF6F0; position: relative; overflow-x: hidden; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); }
+    .screen { display: none; }
+    .screen.active { display: block; }
+    .pulse-animation { animation: pulse 2s infinite; }
+    @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
   </style>
 </head>
-<body>
-  <div class="phone">
-    <main class="min-h-full px-6 py-8 flex flex-col">
-      <header class="flex items-center justify-between">
-        <span class="rounded-full bg-white px-3 py-1 text-xs font-semibold text-brand-orange shadow-sm">LOCAL FOOD STORIES</span>
-        <button id="info-btn" class="grid h-9 w-9 place-items-center rounded-full bg-white text-slate-500 shadow-sm" aria-label="ข้อมูลโครงการ">
-          <i class="fa-solid fa-circle-info"></i>
+<body class="p-0 sm:p-6 bg-slate-900 min-h-screen flex items-center justify-center">
+
+  <div class="app-container rounded-none sm:rounded-[36px] flex flex-col justify-between border-0 sm:border-8 border-slate-800">
+    <!-- หน้านี้เป็นหน้าเลือกบทบาทเท่านั้น -->
+    
+    <!-- ==================== SCREEN 1: ROLE SELECTION ==================== -->
+    <div id="screen-role" class="screen active p-6 flex flex-col justify-between min-h-[840px] bg-gradient-to-b from-amber-50 via-orange-50 to-orange-100">
+      <div class="text-center pt-12">
+        <div class="w-24 h-24 bg-isan-orange text-white rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg text-4xl border-4 border-amber-200">
+          <i class="fa-solid fa-microphone-lines"></i>
+        </div>
+        <h1 class="text-3xl font-bold text-slate-800 tracking-tight">เสียงสารคาม</h1>
+        <p class="text-isan-orange font-medium mt-1">"ฟังเสียงอีสาน ชิมรสชาติเมืองสารคาม"</p>
+        <span class="inline-block mt-3 bg-amber-200 text-amber-900 text-xs px-3 py-1 rounded-full font-semibold">
+          📍 แพลตฟอร์มสนับสนุนร้านหาบเร่เมืองรอง
+        </span>
+      </div>
+
+      <div class="space-y-4 my-auto">
+        <p class="text-center text-slate-600 font-medium text-sm mb-2">กรุณาเลือกรูปแบบการใช้งาน</p>
+        
+        <!-- Button: Customer -->
+        <button onclick="location.href='customer.html'" class="w-full bg-white hover:bg-orange-50 text-slate-800 border-2 border-isan-orange p-5 rounded-2xl shadow-md text-left transition flex items-center justify-between group">
+          <div class="flex items-center space-x-4">
+            <div class="w-14 h-14 bg-orange-100 text-isan-orange rounded-xl flex items-center justify-center text-2xl group-hover:scale-110 transition">
+              🎧
+            </div>
+            <div>
+              <div class="font-bold text-lg text-slate-900">ฉันมาหาของกิน</div>
+              <div class="text-xs text-slate-500">สำหรับนักศึกษา / คนพื้นที่ / นักท่องเที่ยว</div>
+            </div>
+          </div>
+          <i class="fa-solid fa-chevron-right text-slate-400 group-hover:translate-x-1 transition"></i>
         </button>
-      </header>
 
-      <section class="flex-1 flex flex-col justify-center py-12">
-        <div class="text-center">
-          <div class="brand-mark mx-auto mb-6 grid h-28 w-28 place-items-center rounded-[34px] bg-brand-orange text-5xl text-white shadow-xl ring-8 ring-orange-100">
-            <i class="fa-solid fa-microphone-lines"></i>
+        <!-- Button: Vendor -->
+        <button onclick="location.href='vendor.html'" class="w-full bg-isan-vendor hover:bg-slate-800 text-white p-5 rounded-2xl shadow-md text-left transition flex items-center justify-between group">
+          <div class="flex items-center space-x-4">
+            <div class="w-14 h-14 bg-white/10 text-amber-300 rounded-xl flex items-center justify-center text-2xl group-hover:scale-110 transition">
+              🛒
+            </div>
+            <div>
+              <div class="font-bold text-lg text-amber-300">ฉันเป็นพ่อค้าแม่ค้า</div>
+              <div class="text-xs text-slate-300">เล่าเรื่องร้าน + บันทึกบัญชีด้วยเสียง</div>
+            </div>
           </div>
-          <h1 class="text-4xl font-bold tracking-tight text-brand-navy">เสียงสารคาม</h1>
-          <p class="mt-2 text-base text-slate-600">ฟังเสียงอีสาน ชิมรสชาติเมืองสารคาม</p>
-          <div class="mx-auto mt-5 flex w-fit items-center gap-2 rounded-full bg-amber-100 px-4 py-2 text-xs font-medium text-amber-900">
-            <i class="fa-solid fa-location-dot text-brand-orange"></i>
-            <span>แพลตฟอร์มชุมชนมหาสารคาม</span>
-          </div>
-        </div>
+          <i class="fa-solid fa-chevron-right text-slate-400 group-hover:translate-x-1 transition"></i>
+        </button>
+      </div>
 
-        <div class="mt-12">
-          <p class="mb-4 text-center text-sm font-medium text-slate-500">คุณต้องการใช้งานแบบไหน?</p>
-          <div class="space-y-4">
-            <a href="customer.html" class="role-card flex items-center gap-4 rounded-3xl border border-orange-100 bg-white p-5 shadow-md">
-              <span class="grid h-16 w-16 shrink-0 place-items-center rounded-2xl bg-orange-100 text-3xl">🎧</span>
-              <span class="min-w-0 flex-1">
-                <strong class="block text-lg font-bold text-brand-navy">ฉันมาหาของกิน</strong>
-                <small class="mt-1 block leading-5 text-slate-500">ค้นหาร้านเด็ด ฟังเรื่องเล่าจากเจ้าของร้าน</small>
-              </span>
-              <i class="fa-solid fa-chevron-right text-brand-orange"></i>
-            </a>
-            <a href="vendor.html" class="role-card flex items-center gap-4 rounded-3xl bg-brand-navy p-5 text-white shadow-md">
-              <span class="grid h-16 w-16 shrink-0 place-items-center rounded-2xl bg-white/10 text-3xl">🛒</span>
-              <span class="min-w-0 flex-1">
-                <strong class="block text-lg font-bold text-amber-300">ฉันเป็นพ่อค้าแม่ค้า</strong>
-                <small class="mt-1 block leading-5 text-slate-300">เล่าเรื่องร้าน บันทึกบัญชี และดูยอดขาย</small>
-              </span>
-              <i class="fa-solid fa-chevron-right text-amber-300"></i>
-            </a>
-          </div>
-        </div>
-      </section>
-
-      <footer class="border-t border-orange-100 pt-5 text-center">
-        <p class="text-xs leading-5 text-slate-400">ขับเคลื่อนโดยเทศบาลเมืองมหาสารคาม<br>และเครือข่ายชุมชนท้องถิ่น</p>
-      </footer>
-    </main>
-
-    <div id="info-modal" class="fixed inset-0 z-50 hidden items-end justify-center bg-brand-navy/60 p-4 sm:items-center">
-      <div class="w-full max-w-[430px] rounded-3xl bg-white p-6 shadow-2xl">
-        <div class="flex items-center justify-between"><h2 class="text-lg font-bold text-brand-navy">เกี่ยวกับเสียงสารคาม</h2><button id="close-info" class="grid h-8 w-8 place-items-center rounded-full bg-slate-100 text-slate-500"><i class="fa-solid fa-xmark"></i></button></div>
-        <p class="mt-4 text-sm leading-6 text-slate-600">พื้นที่เล็กๆ ที่ช่วยให้คนกินค้นพบร้านท้องถิ่น และช่วยให้พ่อค้าแม่ค้าเล่าเรื่องราวของตัวเองผ่านเสียง</p>
-        <button id="understand-btn" class="mt-5 w-full rounded-2xl bg-brand-orange py-3 font-semibold text-white">เข้าใจแล้ว</button>
+      <div class="text-center pb-6 text-xs text-slate-400">
+        โครงการดิจิทัลเพื่อชุมชน จังหวัดมหาสารคาม
       </div>
     </div>
+
+    <!-- ==================== SCREEN 2: CUSTOMER HOME ==================== -->
+    <!-- หน้าการใช้งานจริงอยู่ที่ customer.html -->
+    <div id="screen-customer-home" class="screen p-4 pb-20" aria-hidden="true">
+      <!-- Header -->
+      <div class="flex justify-between items-center mb-4 pt-4">
+        <div>
+          <span class="text-xs font-bold text-isan-orange tracking-wider uppercase">มหาสารคาม</span>
+          <h2 class="text-xl font-bold text-slate-800">สำรวจรสชาติผ่านเสียง 🌾</h2>
+        </div>
+        <button onclick="switchScreen('screen-role')" class="bg-white border text-xs px-3 py-1.5 rounded-full text-slate-600 shadow-sm">
+          <i class="fa-solid fa-arrow-left text-xs mr-1"></i> สลับบทบาท
+        </button>
+      </div>
+
+      <!-- Search Bar -->
+      <div class="relative mb-4">
+        <input type="text" placeholder="อยากกินอะไร หรืออยากฟังเสียงร้านไหน?" class="w-full pl-10 pr-4 py-3 rounded-xl border-0 shadow-sm text-sm focus:outline-none focus:ring-2 focus:ring-isan-orange bg-white">
+        <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3.5 text-slate-400"></i>
+      </div>
+
+      <!-- Quick Menu -->
+      <div class="grid grid-cols-2 gap-3 mb-5">
+        <button class="bg-amber-500 text-white p-3 rounded-xl font-medium text-sm flex items-center justify-center shadow-sm">
+          <i class="fa-solid fa-map-location-dot mr-2"></i> แผนที่ร้านใกล้ตัว
+        </button>
+        <button class="bg-emerald-600 text-white p-3 rounded-xl font-medium text-sm flex items-center justify-center shadow-sm">
+          <i class="fa-solid fa-shuffle mr-2"></i> เดินตามเสียง (สุ่มฟัง)
+        </button>
+      </div>
+
+      <!-- Festival Module -->
+      <div class="bg-gradient-to-r from-orange-500 to-amber-500 text-white p-4 rounded-2xl mb-5 shadow-md">
+        <div class="flex justify-between items-start mb-2">
+          <span class="bg-white/20 text-xs px-2.5 py-0.5 rounded-full font-semibold">🎉 งานบุญใกล้นี้</span>
+          <span class="text-xs text-amber-100">12 - 15 ก.พ.</span>
+        </div>
+        <h3 class="font-bold text-base">งานบุญเบิกฟ้า มหาสารคาม</h3>
+        <p class="text-xs opacity-90 mt-1">รวม 15 ร้านหาบเร่โบราณ มาตั้งแผงฟังเสียงเล่าเรื่องจริงได้ที่หน้างาน!</p>
+      </div>
+
+      <!-- Hot & New Modules -->
+      <div class="space-y-4">
+        <div class="flex justify-between items-center">
+          <h3 class="font-bold text-slate-800 text-base">🔥 ฮิตติดหูสัปดาห์นี้</h3>
+          <span class="text-xs text-isan-orange font-medium">ดูทั้งหมด</span>
+        </div>
+
+        <!-- Store Card 1 -->
+        <div onclick="switchScreen('screen-customer-detail')" class="bg-white p-3.5 rounded-2xl shadow-sm border border-slate-100 flex items-center space-x-3 cursor-pointer hover:border-isan-orange transition">
+          <img src="https://images.unsplash.com/photo-1555126634-323283e090fa?w=150&auto=format&fit=crop&q=60" class="w-16 h-16 rounded-xl object-cover">
+          <div class="flex-1">
+            <div class="flex items-center justify-between">
+              <h4 class="font-bold text-slate-800 text-sm">ลาบยายคำ (สูตร 30 ปี)</h4>
+              <span class="text-xs text-slate-400">400 ม.</span>
+            </div>
+            <p class="text-xs text-slate-500 mb-2">หน้า มมส. เก่า • อาหารอีสานแท้</p>
+            <div class="bg-amber-50 text-amber-900 text-xs px-2.5 py-1 rounded-lg flex items-center justify-between">
+              <span class="truncate"><i class="fa-solid fa-volume-high text-isan-orange mr-1"></i> “ขายลาบมาสามสิบปีแล้วน้อ...”</span>
+              <i class="fa-solid fa-play text-isan-orange text-xs"></i>
+            </div>
+          </div>
+        </div>
+
+        <!-- Store Card 2 -->
+        <div class="bg-white p-3.5 rounded-2xl shadow-sm border border-slate-100 flex items-center space-x-3">
+          <img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=150&auto=format&fit=crop&q=60" class="w-16 h-16 rounded-xl object-cover">
+          <div class="flex-1">
+            <div class="flex items-center justify-between">
+              <h4 class="font-bold text-slate-800 text-sm">ไก่ย่างวิเชียร พ่อเสก</h4>
+              <span class="text-xs text-slate-400">1.2 กม.</span>
+            </div>
+            <p class="text-xs text-slate-500 mb-2">ย่านท่าขอนยาง • ไก่หมักสมุนไพร</p>
+            <div class="bg-amber-50 text-amber-900 text-xs px-2.5 py-1 rounded-lg flex items-center justify-between">
+              <span class="truncate"><i class="fa-solid fa-volume-high text-isan-orange mr-1"></i> “สูตรนี้ตำเอง น้ำจิ้มแจ่วส้ม...”</span>
+              <i class="fa-solid fa-play text-isan-orange text-xs"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== SCREEN 3: STORE DETAIL (CUSTOMER VIEW) ==================== -->
+    <div id="screen-customer-detail" class="screen p-4 pb-20">
+      <!-- Back Header -->
+      <button onclick="switchScreen('screen-customer-home')" class="mb-3 bg-white p-2 rounded-full shadow-sm text-slate-600 text-sm flex items-center px-3">
+        <i class="fa-solid fa-chevron-left mr-2"></i> ย้อนกลับ
+      </button>
+
+      <!-- Store Cover -->
+      <div class="relative rounded-2xl overflow-hidden mb-4 shadow-sm">
+        <img src="https://images.unsplash.com/photo-1555126634-323283e090fa?w=500&auto=format&fit=crop&q=60" class="w-full h-44 object-cover">
+        <div class="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/80 to-transparent p-4 text-white">
+          <span class="bg-isan-orange text-[10px] px-2 py-0.5 rounded-full font-bold">ร้านเด็ดหน้า มมส.</span>
+          <h2 class="text-xl font-bold mt-1">ลาบยายคำ (สูตร 30 ปี)</h2>
+          <p class="text-xs text-slate-200">เปิด 16:00 - 22:00 น. • หยุดวันอาทิตย์</p>
+        </div>
+      </div>
+
+      <!-- AUDIO PLAYER HERO SECTION -->
+      <div class="bg-amber-100 border-2 border-amber-300 p-4 rounded-2xl mb-4 text-center">
+        <p class="text-xs text-amber-800 font-medium mb-1">🎧 เสียงเรื่องเล่าจากเจ้าของร้าน (ภาษาอีสาน)</p>
+        <div class="flex items-center justify-center space-x-3 my-2">
+          <button onclick="toggleAudio()" id="play-btn" class="w-12 h-12 bg-isan-orange text-white rounded-full flex items-center justify-center text-xl shadow-md pulse-animation">
+            <i class="fa-solid fa-play" id="play-icon"></i>
+          </button>
+          <div class="text-left">
+            <div class="text-sm font-bold text-slate-800">"ขายลาบมาสามสิบปีแล้วน้อ..."</div>
+            <div class="text-xs text-slate-500">ยายคำ (ความยาว 0:45 นาที)</div>
+          </div>
+        </div>
+        <div class="w-full bg-amber-200 h-1.5 rounded-full overflow-hidden mt-2">
+          <div id="audio-progress" class="bg-isan-orange h-full w-1/3"></div>
+        </div>
+      </div>
+
+      <!-- Info Stats -->
+      <div class="grid grid-cols-2 gap-3 mb-4">
+        <div class="bg-white p-3 rounded-xl text-center border">
+          <div class="text-xs text-slate-400">คนฟังเสียงนี้ไปแล้ว</div>
+          <div class="text-lg font-bold text-isan-orange">1,250 ครั้ง</div>
+        </div>
+        <div class="bg-white p-3 rounded-xl text-center border">
+          <div class="text-xs text-slate-400">บันทึกเป็นร้านโปรด</div>
+          <div class="text-lg font-bold text-emerald-600">300 คน</div>
+        </div>
+      </div>
+
+      <!-- Peak Hours Graph -->
+      <div class="bg-white p-4 rounded-2xl border mb-4">
+        <h4 class="font-bold text-slate-800 text-xs mb-3"><i class="fa-solid fa-chart-simple text-isan-orange mr-1"></i> ช่วงเวลาคนแน่นที่สุด</h4>
+        <div class="flex items-end justify-between h-20 pt-4 px-2">
+          <div class="flex flex-col items-center gap-1">
+            <div class="w-6 bg-orange-200 h-8 rounded-t"></div>
+            <span class="text-[10px] text-slate-400">16:00</span>
+          </div>
+          <div class="flex flex-col items-center gap-1">
+            <div class="w-6 bg-isan-orange h-16 rounded-t"></div>
+            <span class="text-[10px] text-slate-800 font-bold">18:00</span>
+          </div>
+          <div class="flex flex-col items-center gap-1">
+            <div class="w-6 bg-isan-orange h-14 rounded-t"></div>
+            <span class="text-[10px] text-slate-600">19:00</span>
+          </div>
+          <div class="flex flex-col items-center gap-1">
+            <div class="w-6 bg-orange-200 h-6 rounded-t"></div>
+            <span class="text-[10px] text-slate-400">21:00</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Customer Reviews -->
+      <div class="bg-white p-4 rounded-2xl border">
+        <h4 class="font-bold text-slate-800 text-xs mb-2">💬 รีวิวสั้นจากลูกค้า</h4>
+        <div class="space-y-2 text-xs text-slate-600">
+          <div class="bg-slate-50 p-2.5 rounded-lg">"ลาบนัวมาก ยายใจดีให้เยอะ สมคำเล่าในคลิป!" - นศ. มมส.</div>
+          <div class="bg-slate-50 p-2.5 rounded-lg">"ฟังเสียงยายแล้วต้องเดินตามมาซื้อ ของจริงตรงปกฮะ" - กอล์ฟ</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== SCREEN 4: VENDOR HOME ==================== -->
+    <div id="screen-vendor-home" class="screen p-4 pb-20 bg-slate-50">
+      <!-- Top Bar -->
+      <div class="flex justify-between items-center mb-4 pt-4">
+        <div class="flex items-center space-x-2">
+          <div class="w-10 h-10 bg-amber-400 text-slate-900 rounded-full flex items-center justify-center font-bold text-lg">
+            👵
+          </div>
+          <div>
+            <h2 class="font-bold text-slate-800 text-sm">แม่บัว ร้านตำซั่ว</h2>
+            <span class="text-xs text-emerald-600 font-semibold">● เปิดร้านอยู่</span>
+          </div>
+        </div>
+        <button onclick="switchScreen('screen-role')" class="bg-white border text-xs px-3 py-1.5 rounded-full text-slate-600 shadow-sm">
+          <i class="fa-solid fa-arrow-left text-xs mr-1"></i> สลับบทบาท
+        </button>
+      </div>
+
+      <!-- Quick Summary Banner -->
+      <div class="bg-isan-vendor text-white p-4 rounded-2xl mb-4 shadow-md">
+        <div class="text-xs text-slate-300">ยอดขายวันนี้ (บันทึกด้วยเสียง)</div>
+        <div class="text-3xl font-bold text-amber-300 my-1">1,450 บาท</div>
+        <div class="text-xs text-slate-300">ขายได้ประมาณ 28 จาน • กำไรประมาณ 620 บาท</div>
+      </div>
+
+      <!-- VOICE RECORDING ACTION BUTTON -->
+      <div class="bg-orange-50 border-2 border-dashed border-isan-orange p-4 rounded-2xl text-center mb-5">
+        <button class="w-16 h-16 bg-isan-orange text-white rounded-full flex items-center justify-center text-2xl mx-auto shadow-lg mb-2 hover:scale-105 transition">
+          <i class="fa-solid fa-microphone"></i>
+        </button>
+        <div class="font-bold text-slate-800 text-sm">กดแล้วพูด เพื่อบันทึกรายรับ-รายจ่าย</div>
+        <p class="text-xs text-slate-500 mt-0.5">เช่น “ซื้อวัตถุดิบส้มตำห้าร้อย” หรือ “ขายได้แปดร้อย”</p>
+      </div>
+
+      <!-- Quick Shortcuts -->
+      <div class="grid grid-cols-2 gap-3 mb-5">
+        <button class="bg-white p-3.5 rounded-xl border text-left shadow-sm hover:border-isan-orange">
+          <div class="text-isan-orange text-xl mb-1"><i class="fa-solid fa-bullhorn"></i></div>
+          <div class="font-bold text-slate-800 text-xs">อัดเสียงเล่าเรื่องร้าน</div>
+          <div class="text-[10px] text-slate-400">อัปเดตคลิปเสียงโปรโมท</div>
+        </button>
+        <button onclick="switchScreen('screen-vendor-finance')" class="bg-white p-3.5 rounded-xl border text-left shadow-sm hover:border-isan-orange">
+          <div class="text-emerald-600 text-xl mb-1"><i class="fa-solid fa-chart-line"></i></div>
+          <div class="font-bold text-slate-800 text-xs">ดูสรุปการเงินร้าน</div>
+          <div class="text-[10px] text-slate-400">กราฟกำไร + ยอดฟังเสียง</div>
+        </button>
+      </div>
+
+      <!-- Festival Impact Alert -->
+      <div class="bg-amber-100 border border-amber-300 p-3.5 rounded-xl mb-4">
+        <div class="flex items-center space-x-2 text-amber-900 font-bold text-xs mb-1">
+          <i class="fa-solid fa-calendar-check text-isan-orange"></i>
+          <span>แจ้งเตือนเทศกาลกระทบยอดขาย</span>
+        </div>
+        <p class="text-xs text-amber-800">
+          พรุ่งนี้มีงานรับปริญญา มมส. คาดว่าคนจะพลุกพล่าน เตรียมของเพิ่มได้เลย!
+        </p>
+      </div>
+
+      <!-- Tips for Vendors -->
+      <div class="bg-white p-4 rounded-2xl border">
+        <h4 class="font-bold text-slate-800 text-xs mb-2">💡 ทิปการเงินสำหรับพ่อค้าแม่ค้า</h4>
+        <p class="text-xs text-slate-600">
+          "แยกกระเป๋าเงินส่วนตัวกับเงินร้าน จะช่วยให้รู้กำไรแท้จริงของแต่ละวัน"
+        </p>
+      </div>
+    </div>
+
+    <!-- ==================== SCREEN 5: VENDOR FINANCE DASHBOARD ==================== -->
+    <div id="screen-vendor-finance" class="screen p-4 pb-20 bg-slate-50">
+      <!-- Back Header -->
+      <button onclick="switchScreen('screen-vendor-home')" class="mb-3 bg-white p-2 rounded-full shadow-sm text-slate-600 text-sm flex items-center px-3">
+        <i class="fa-solid fa-chevron-left mr-2"></i> ย้อนกลับ
+      </button>
+
+      <h2 class="text-lg font-bold text-slate-800 mb-3">📊 สรุปการเงิน & การตลาด</h2>
+
+      <!-- P&L Cards -->
+      <div class="grid grid-cols-3 gap-2 mb-4">
+        <div class="bg-white p-2.5 rounded-xl border text-center">
+          <span class="text-[10px] text-slate-400">รายรับเดือนนี้</span>
+          <div class="text-sm font-bold text-slate-800">24,500.-</div>
+        </div>
+        <div class="bg-white p-2.5 rounded-xl border text-center">
+          <span class="text-[10px] text-slate-400">ต้นทุน</span>
+          <div class="text-sm font-bold text-rose-500">14,000.-</div>
+        </div>
+        <div class="bg-emerald-50 p-2.5 rounded-xl border border-emerald-200 text-center">
+          <span class="text-[10px] text-emerald-700">กำไรสุทธิ</span>
+          <div class="text-sm font-bold text-emerald-600">10,500.-</div>
+        </div>
+      </div>
+
+      <!-- Marketing vs Sales Insight (Voice Views vs Sales) -->
+      <div class="bg-white p-4 rounded-2xl border mb-4">
+        <div class="flex justify-between items-start mb-2">
+          <div>
+            <h4 class="font-bold text-slate-800 text-xs">การเล่าเรื่องช่วยขายดีขึ้นจริงไหม?</h4>
+            <p class="text-[10px] text-slate-400">เปรียบเทียบยอดฟังเสียง vs ยอดขายย้อนหลัง</p>
+          </div>
+          <span class="bg-emerald-100 text-emerald-800 text-[10px] px-2 py-0.5 rounded font-bold">+15% เดือนนี้</span>
+        </div>
+
+        <!-- Simulated Dual Chart -->
+        <div class="h-28 flex items-end justify-between pt-4 px-2 border-b pb-2">
+          <div class="flex flex-col items-center gap-1">
+            <div class="flex space-x-1 items-end">
+              <div class="w-3 bg-amber-300 h-6 rounded-t"></div>
+              <div class="w-3 bg-isan-orange h-8 rounded-t"></div>
+            </div>
+            <span class="text-[9px] text-slate-400">สัปดาห์ 1</span>
+          </div>
+          <div class="flex flex-col items-center gap-1">
+            <div class="flex space-x-1 items-end">
+              <div class="w-3 bg-amber-300 h-10 rounded-t"></div>
+              <div class="w-3 bg-isan-orange h-14 rounded-t"></div>
+            </div>
+            <span class="text-[9px] text-slate-400">สัปดาห์ 2</span>
+          </div>
+          <div class="flex flex-col items-center gap-1">
+            <div class="flex space-x-1 items-end">
+              <div class="w-3 bg-amber-300 h-14 rounded-t"></div>
+              <div class="w-3 bg-isan-orange h-20 rounded-t"></div>
+            </div>
+            <span class="text-[9px] text-slate-800 font-bold">สัปดาห์นี้</span>
+          </div>
+        </div>
+        <div class="flex justify-center space-x-4 mt-2 text-[10px]">
+          <span class="flex items-center"><span class="w-2.5 h-2.5 bg-amber-300 rounded-full mr-1"></span> ยอดฟังเสียง</span>
+          <span class="flex items-center"><span class="w-2.5 h-2.5 bg-isan-orange rounded-full mr-1"></span> ยอดขาย (บาท)</span>
+        </div>
+      </div>
+
+      <!-- Anonymous Benchmark Card -->
+      <div class="bg-indigo-900 text-white p-4 rounded-2xl shadow-sm">
+        <div class="flex items-center space-x-2 text-indigo-200 text-xs mb-1">
+          <i class="fa-solid fa-lightbulb text-amber-300"></i>
+          <span class="font-bold">Insight เฉพาะย่านนี้ (ไม่ระบุตัวตน)</span>
+        </div>
+        <p class="text-xs text-indigo-100">
+          "ร้านอาหารประเภทส้มตำ/ลาบ แถวมหาลัย ขายได้เฉลี่ย <strong class="text-amber-300">1,500 บาท/วัน</strong>"
+        </p>
+        <div class="mt-2 text-[10px] text-indigo-300">
+          💡 ร้านแม่บัวทำได้ใกล้เคียงค่าเฉลี่ยแล้ว! ลองอัปเดตคลิปเสียงใหม่เพื่อเพิ่มยอดเปิดฟัง
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Navigation Bar (Contextual) -->
+    <div id="bottom-nav" class="hidden bg-white border-t py-2 px-6 flex justify-around text-slate-400 text-xs fixed bottom-0 left-0 right-0 max-w-[430px] mx-auto">
+      <button class="text-isan-orange flex flex-col items-center">
+        <i class="fa-solid fa-house text-base"></i>
+        <span class="text-[10px] mt-0.5">หน้าแรก</span>
+      </button>
+      <button class="flex flex-col items-center">
+        <i class="fa-solid fa-map text-base"></i>
+        <span class="text-[10px] mt-0.5">แผนที่</span>
+      </button>
+      <button class="flex flex-col items-center">
+        <i class="fa-solid fa-bookmark text-base"></i>
+        <span class="text-[10px] mt-0.5">บันทึกไว้</span>
+      </button>
+    </div>
+
   </div>
 
   <script>
-    const modal = document.querySelector('#info-modal');
-    function openInfo() { modal.classList.remove('hidden'); modal.classList.add('flex'); }
-    function closeInfo() { modal.classList.add('hidden'); modal.classList.remove('flex'); }
-    document.querySelector('#info-btn').addEventListener('click', openInfo);
-    document.querySelector('#close-info').addEventListener('click', closeInfo);
-    document.querySelector('#understand-btn').addEventListener('click', closeInfo);
-    modal.addEventListener('click', event => { if (event.target === modal) closeInfo(); });
+    function switchScreen(screenId) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.getElementById(screenId).classList.add('active');
+
+      const bottomNav = document.getElementById('bottom-nav');
+      if (screenId === 'screen-role') {
+        bottomNav.classList.add('hidden');
+      } else {
+        bottomNav.classList.remove('hidden');
+      }
+    }
+
+    let isPlaying = false;
+    function toggleAudio() {
+      const btn = document.getElementById('play-btn');
+      const icon = document.getElementById('play-icon');
+      const progress = document.getElementById('audio-progress');
+
+      if (!isPlaying) {
+        icon.className = "fa-solid fa-pause";
+        progress.style.width = "80%";
+        progress.style.transition = "width 3s linear";
+        isPlaying = true;
+      } else {
+        icon.className = "fa-solid fa-play";
+        progress.style.width = "33%";
+        isPlaying = false;
+      }
+    }
   </script>
 </body>
 </html>

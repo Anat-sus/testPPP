@@ -47,8 +47,8 @@
   <script>
     const BASE_URL = "https://itmsuhackathon.askme.co.th";
     const MODEL_ID = "gemini-3.1-flash-image-preview";
-    const EMAIL = "67011212102@msu.ac.th";
-    const PASSWORD = "Ablue@2005";
+    const EMAIL = "66011212178@msu.ac.th";
+    const PASSWORD = "Thi_wa0923569030";
     const state = { token: "", files: [], sessionId: "" };
     const statusEl = document.querySelector("#status");
     const filesEl = document.querySelector("#files");
@@ -111,32 +111,8 @@
     }
 
     function findImagePath(data) {
-      const candidates = [
-        data?.url,
-        data?.file_url,
-        data?.image_url,
-        data?.path,
-        data?.file?.url,
-        data?.file?.path,
-        data?.data?.url,
-        data?.data?.file_url,
-        data?.data?.image_url,
-        data?.data?.path,
-        data?.data?.file?.url,
-        data?.data?.file?.path,
-        data?.result?.url,
-        data?.result?.file_url,
-        data?.result?.image_url,
-        data?.result?.path,
-        data?.result?.file?.url,
-        data?.result?.file?.path
-      ];
-      const directPath = candidates.find(value => typeof value === "string" && value.trim());
-      if (directPath) return directPath;
-
-      const json = JSON.stringify(data);
-      const urlMatch = json.match(/(?:https?:\/\/[^"\s]+|(?:[A-Za-z0-9_-]+\/)+generated_[^"\s]+)/i);
-      return urlMatch ? urlMatch[0].replace(/\\\//g, "/") : null;
+      const candidates = [data?.url, data?.file_url, data?.image_url, data?.path, data?.file?.url, data?.data?.url, data?.data?.file_url, data?.data?.path, data?.result?.url, data?.result?.path];
+      return candidates.find(value => typeof value === "string");
     }
 
     filesEl.addEventListener("change", () => {
@@ -171,11 +147,8 @@
         });
         const data = await response.json();
         if (!response.ok) throw new Error(errorMessage(data, "สร้างภาพไม่สำเร็จ"));
-        const imagePath = findImagePath(data);
-        if (!imagePath) {
-          throw new Error(`ไม่พบ URL ของภาพที่สร้าง: ${JSON.stringify(data)}`);
-        }
-        const imageUrl = buildFileUrl(imagePath);
+        const imageUrl = buildFileUrl(findImagePath(data));
+        if (!imageUrl) throw new Error("ไม่พบ URL ของภาพที่สร้าง");
         const imageResponse = await fetch(imageUrl, { headers: { Authorization: `Bearer ${state.token}`, Accept: "*/*" } });
         if (!imageResponse.ok) throw new Error(`โหลดภาพไม่สำเร็จ (${imageResponse.status})`);
         const image = document.createElement("img");
